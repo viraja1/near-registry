@@ -19,7 +19,7 @@ Exploring The Code
    the NEAR blockchain when you run `yarn deploy`. This sort of
    code-that-runs-on-a-blockchain is called a "smart contract" – [learn more
    about NEAR smart contracts][smart contract docs].
-2. Tests: The backend code gets tested with the [test] command for running the backend
+2. Tests: The backend code gets tested with the `yarn test` command for running the backend
    AssemblyScript tests.
 
 #### model.ts
@@ -91,10 +91,20 @@ export function getEntries(): Entry[] {
 }
 ```
 
+Setup
+======
+```
+git clone https://github.com/viraja1/near-registry.git
+cd near-registry
+yarn install
+yarn test
+```
+
 Deploy
 ======
 
-Every smart contract in NEAR has its [own associated account][NEAR accounts]. When you run `yarn dev`, your smart contracts get deployed to the live NEAR TestNet with a throwaway account. When you're ready to make it permanent, here's how.
+Every smart contract in NEAR has its [own associated account][NEAR accounts]. 
+When you run `yarn dev`, your smart contracts get deployed to the live NEAR TestNet with a throwaway account. When you're ready to make it permanent, here's how.
 
 
 Step 0: Install near-cli
