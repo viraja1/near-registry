@@ -190,8 +190,8 @@ yarn install
 yarn test
 ```
 
-Deploy
-======
+Deploy Smart Contract
+=====================
 
 Every smart contract in NEAR has its [own associated account][NEAR accounts]. 
 When you run `yarn dev`, your smart contracts get deployed to the live NEAR TestNet with a throwaway account. When you're ready to make it permanent, here's how.
@@ -227,6 +227,19 @@ One command:
 
 As you can see in `package.json`, this builds & deploys smart contracts to NEAR TestNet.
 
+
+Run the Frontend
+================
+
+Run the following commands from the near-registry folder
+
+```
+cd src
+yarn install
+yarn start
+```
+
+Then visit http://localhost:1234 from your browser to test the Near Registry
 
 Screenshots
 ======
