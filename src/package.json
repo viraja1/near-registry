@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "start": "parcel index.html"
+    "start": "parcel index.html",
+    "build": "parcel build index.html --public-url ./"
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",
