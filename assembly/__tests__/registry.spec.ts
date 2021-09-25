@@ -1,9 +1,9 @@
 import {addEntry, getEntries, upVoteEntry} from '../main';
-import {Entry, entries, votes} from '../model';
+import {Entry, entries} from '../model';
 import {VMContext, Context, u128} from 'near-sdk-as';
 
 function createEntry(title: string, description: string, url: string): Entry {
-  return new Entry(title, description, url);
+  return new Entry(title, description, url, 0, u128.fromU64(0));
 }
 
 const entry = createEntry('Near Protocol - Infrastructure for Innovation',
@@ -35,12 +35,12 @@ describe('entries tests', () => {
     addEntry('Near Protocol - Infrastructure for Innovation',
       'NEAR is an open source platform that accelerates the development of decentralized applications.',
       'https://near.org/');
-    expect(votes.getSome(u32(0)).toString()).toStrictEqual(u128.fromU32(0).toString(),
+    expect(entries[0].votes.toString()).toStrictEqual(u128.fromU32(0).toString(),
       'entry should have 0 vote'
     );
     VMContext.setAttached_deposit(u128.from('10000000000000000000000'));
-    upVoteEntry(u32(0));
-    expect(votes.getSome(u32(0)).toString()).toStrictEqual(u128.from('10000000000000000000000').toString(),
+    upVoteEntry(i32(0));
+    expect(entries[0].votes.toString()).toStrictEqual(u128.from('10000000000000000000000').toString(),
       'entry should have a vote'
     );
   });

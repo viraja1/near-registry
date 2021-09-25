@@ -24,7 +24,7 @@ Exploring The Code
 
 #### assembly/model.ts
 ```
-import {context, u128, PersistentVector, PersistentMap} from "near-sdk-as";
+import {context, u128, PersistentVector} from "near-sdk-as";
 
 /**
  * Exporting a new class Entry so it can be used outside of this file.
@@ -33,7 +33,7 @@ import {context, u128, PersistentVector, PersistentMap} from "near-sdk-as";
 export class Entry {
   sender: string;
 
-  constructor(public title: string, public description: string, public url: string) {
+  constructor(public title: string, public description: string, public url: string, public id: i32, public votes: u128) {
     this.sender = context.sender;
   }
 }
@@ -45,12 +45,11 @@ export class Entry {
  * It will be used as a prefix to all keys required to store data in the storage.
  */
 export const entries = new PersistentVector<Entry>("entries");
-export const votes = new PersistentMap<u32, u128>("votes");
 ```
 
 #### assembly/main.ts
 ```
-import {Entry, entries, votes} from './model';
+import {Entry, entries} from './model';
 import {context, u128} from "near-sdk-as";
 
 // --- contract code goes below
@@ -62,10 +61,9 @@ import {context, u128} from "near-sdk-as";
  */
 export function addEntry(title: string, description: string, url: string): void {
   // Creating a new entry and populating fields with our data
-  const entry = new Entry(title, description, url);
+  const entry = new Entry(title, description, url, entries.length, u128.fromU64(0));
   // Adding the entry to end of the the persistent collection
   entries.push(entry);
-  votes.set(entries.length - 1, u128.fromU32(0));
 }
 
 
@@ -74,8 +72,10 @@ export function addEntry(title: string, description: string, url: string): void 
  * NOTE: This is a change method. Which means it will modify the state.\
  * But right now we don't distinguish them with annotations yet.
  */
-export function upVoteEntry(index: u32): void {
-  votes.set(index, votes.getSome(index) + context.attachedDeposit);
+export function upVoteEntry(index: i32): void {
+  const entry = entries[i32(index)];
+  entry.votes = u128.add(entry.votes, context.attachedDeposit);
+  entries[i32(index)] = entry;
 }
 
 /**
@@ -94,11 +94,11 @@ export function getEntries(): Entry[] {
 #### assembly/__tests__/registry.spec.ts
 ```
 import {addEntry, getEntries, upVoteEntry} from '../main';
-import {Entry, entries, votes} from '../model';
+import {Entry, entries} from '../model';
 import {VMContext, Context, u128} from 'near-sdk-as';
 
 function createEntry(title: string, description: string, url: string): Entry {
-  return new Entry(title, description, url);
+  return new Entry(title, description, url, 0, u128.fromU64(0));
 }
 
 const entry = createEntry('Near Protocol - Infrastructure for Innovation',
@@ -130,12 +130,12 @@ describe('entries tests', () => {
     addEntry('Near Protocol - Infrastructure for Innovation',
       'NEAR is an open source platform that accelerates the development of decentralized applications.',
       'https://near.org/');
-    expect(votes.getSome(u32(0)).toString()).toStrictEqual(u128.fromU32(0).toString(),
+    expect(entries[0].votes.toString()).toStrictEqual(u128.fromU32(0).toString(),
       'entry should have 0 vote'
     );
     VMContext.setAttached_deposit(u128.from('10000000000000000000000'));
-    upVoteEntry(u32(0));
-    expect(votes.getSome(u32(0)).toString()).toStrictEqual(u128.from('10000000000000000000000').toString(),
+    upVoteEntry(i32(0));
+    expect(entries[0].votes.toString()).toStrictEqual(u128.from('10000000000000000000000').toString(),
       'entry should have a vote'
     );
   });
@@ -179,7 +179,6 @@ describe('attached deposit tests', () => {
     );
   });
 });
-
 ```
 
 Setup
@@ -227,6 +226,17 @@ One command:
     yarn deploy
 
 As you can see in `package.json`, this builds & deploys smart contracts to NEAR TestNet.
+
+
+Screenshots
+======
+![](src/screenshots/near_registry_1.png)
+
+![](src/screenshots/near_registry_2.png)
+
+![](src/screenshots/near_registry_3.png)
+
+![](src/screenshots/near_registry_4.png)
 
 
   [NEAR]: https://nearprotocol.com/

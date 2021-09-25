@@ -1,4 +1,4 @@
-import {Entry, entries, votes} from './model';
+import {Entry, entries} from './model';
 import {context, u128} from "near-sdk-as";
 
 // --- contract code goes below
@@ -10,10 +10,9 @@ import {context, u128} from "near-sdk-as";
  */
 export function addEntry(title: string, description: string, url: string): void {
   // Creating a new entry and populating fields with our data
-  const entry = new Entry(title, description, url);
+  const entry = new Entry(title, description, url, entries.length, u128.fromU64(0));
   // Adding the entry to end of the the persistent collection
   entries.push(entry);
-  votes.set(entries.length - 1, u128.fromU32(0));
 }
 
 
@@ -22,8 +21,10 @@ export function addEntry(title: string, description: string, url: string): void 
  * NOTE: This is a change method. Which means it will modify the state.\
  * But right now we don't distinguish them with annotations yet.
  */
-export function upVoteEntry(index: u32): void {
-  votes.set(index, votes.getSome(index) + context.attachedDeposit);
+export function upVoteEntry(index: i32): void {
+  const entry = entries[i32(index)];
+  entry.votes = u128.add(entry.votes, context.attachedDeposit);
+  entries[i32(index)] = entry;
 }
 
 /**

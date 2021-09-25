@@ -1,4 +1,4 @@
-import {context, u128, PersistentVector, PersistentMap} from "near-sdk-as";
+import {context, u128, PersistentVector} from "near-sdk-as";
 
 /**
  * Exporting a new class Entry so it can be used outside of this file.
@@ -7,7 +7,7 @@ import {context, u128, PersistentVector, PersistentMap} from "near-sdk-as";
 export class Entry {
   sender: string;
 
-  constructor(public title: string, public description: string, public url: string) {
+  constructor(public title: string, public description: string, public url: string, public id: i32, public votes: u128) {
     this.sender = context.sender;
   }
 }
@@ -19,4 +19,3 @@ export class Entry {
  * It will be used as a prefix to all keys required to store data in the storage.
  */
 export const entries = new PersistentVector<Entry>("entries");
-export const votes = new PersistentMap<u32, u128>("votes");
