@@ -227,6 +227,8 @@ One command:
 
 As you can see in `package.json`, this builds & deploys smart contracts to NEAR TestNet.
 
+Note down the smart contract account id from the console and update it in src/config.js:1
+
 
 Run the Frontend
 ================
