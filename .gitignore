@@ -15,3 +15,4 @@ neardev/dev-account*
 # misc
 yarn-error.log
 .idea
+.netlify
