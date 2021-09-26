@@ -19,7 +19,7 @@ export default function Form({onSubmit, currentUser}) {
           <Modal.Title>Add an entry</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <form onSubmit={onSubmit}>
+          <form onSubmit={(e) => {onSubmit(e, setShow);}}>
             <fieldset id="fieldset">
               <p className="highlight">
                 <label htmlFor="title">Title:</label>

@@ -23,7 +23,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     contract.getEntries().then((ent) => setEntries(sortEntries(ent)));
   }, []);
 
-  const onSubmit = (e) => {
+  const onSubmit = (e, setShow) => {
     e.preventDefault();
     const { fieldset, title, description, url } = e.target.elements;
     fieldset.disabled = true;
@@ -38,6 +38,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
         url.value = '';
         fieldset.disabled = false;
         title.focus();
+        setShow(false);
       });
     });
   };
