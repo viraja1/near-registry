@@ -243,6 +243,21 @@ yarn start
 
 Then visit http://localhost:1234 from your browser to test the Near Registry
 
+Deploy frontend using netlify
+=============================
+
+Run the following commands from the near-registry folder
+
+```
+cd src
+yarn build
+yarn global add netlify-cli
+netlify login
+netlify deploy --prod
+```
+
+Then follow the instructions given by the netlify cli and specify `./dist` as the publish directory
+
 Screenshots
 ======
 ![](src/screenshots/near_registry_1.png)
@@ -252,6 +267,11 @@ Screenshots
 ![](src/screenshots/near_registry_3.png)
 
 ![](src/screenshots/near_registry_4.png)
+
+
+App Link (NEAR Testnet)
+=======================
+https://near-registry.netlify.app/
 
 
   [NEAR]: https://nearprotocol.com/
