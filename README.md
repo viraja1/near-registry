@@ -17,10 +17,14 @@ Exploring The Code
 
 1. The backend code lives in the `/assembly` folder. This code gets deployed to
    the NEAR blockchain when you run `yarn deploy`. This sort of
-   code-that-runs-on-a-blockchain is called a "smart contract" – [learn more
+   code that runs on a blockchain is called a "smart contract" – [learn more
    about NEAR smart contracts][smart contract docs].
 2. Tests: The backend code gets tested with the `yarn test` command for running the backend
    AssemblyScript tests.
+3. The frontend code lies in the `/src` folder. It uses near-api-js which is a JavaScript/TypeScript library for 
+   development of decentralized applications on the NEAR platform. It works in conjunction with NEAR RPC endpoints 
+   to help you connect your application to the NEAR blockchain.  
+
 
 #### assembly/model.ts
 ```
