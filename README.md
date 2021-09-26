@@ -1,7 +1,8 @@
 Near Registry
 ==========
 Near Registry allows you to track popular content just like Hacker News. Anyone can post an entry to the Near Registry. 
-Up voting the content requires you to attach NEAR. Same logic can be extended for any other type of registry.
+Up voting the content requires you to attach NEAR. The registry is sorted based on the NEAR attached to the entries. 
+Same logic can be extended for any other type of registry.
 
 Quick Start
 ===========
@@ -17,14 +18,25 @@ Exploring The Code
 
 1. The backend code lives in the `/assembly` folder. This code gets deployed to
    the NEAR blockchain when you run `yarn deploy`. This sort of
-   code that runs on a blockchain is called a "smart contract" – [learn more
+   code that runs on a blockchain is called a "smart contract". [Learn more
    about NEAR smart contracts][smart contract docs].
 2. Tests: The backend code gets tested with the `yarn test` command for running the backend
    AssemblyScript tests.
 3. The frontend code lies in the `/src` folder. It uses near-api-js which is a JavaScript/TypeScript library for 
    development of decentralized applications on the NEAR platform. It works in conjunction with NEAR RPC endpoints 
-   to help you connect your application to the NEAR blockchain.  
+   to help you connect your application to the NEAR blockchain. [Learn more
+    about NEAR Frontend][NEAR Frontend]. 
 
+The NEAR platform supports writing contracts in Rust and AssemblyScript. This app uses AssemblyScript. 
+AssemblyScript is a dialect of TypeScript that compiles to Wasm.
+
+Contracts are a named collection of (exported) functions that have access (via near-sdk-as) to their execution 
+context (sender, receiver, block height, etc) as well as storage services (key-value pair and convenience collections 
+like Map, Vector and Deque), logging services and some utility functions.
+
+To keep things organized, contracts can use one or more data objects which are commonly added to the model.ts file.
+All contracts and models must explicitly import features of the NEAR they intend to use. Not all of these features are 
+used all of the time of course.
 
 #### assembly/model.ts
 ```
@@ -50,6 +62,20 @@ export class Entry {
  */
 export const entries = new PersistentVector<Entry>("entries");
 ```
+
+In the above models.ts file, we define a new type named Entry which is currently not available 
+(as opposed to primitive types like integers, strings and bool which are always available). 
+Since models are just AssemblyScript classes, they support custom constructors. Each entry has sender, title, 
+description, url, id and votes. Each of these is associated with a specific type and is declared as public. In the 
+constructor, we define the sender as  context.sender. The context object provides context for contract execution including 
+information about the transaction sender, blockchain height, and attached deposit available for use during contract 
+execution, etc.
+                                                              
+At the end, we define that entries is a PersistentVector (collection) of type Entry. The PersistentVector writes and reads 
+from storage abstracting away a lot of what you might want to add to the storage object. These collection wrap 
+the Storage class with convenience methods so you must always use a unique storage prefix for different collections 
+to avoid data collision. PersistentVector acts like an array. To create entries, we use the synthax 
+`new PersistentVector<Entry>("entries")`. The vector supports the methods like push, pop and length.
 
 #### assembly/main.ts
 ```
@@ -94,6 +120,20 @@ export function getEntries(): Entry[] {
   return result;
 }
 ```
+
+Contract function calls are stateless. Any state that you want to save to the blockchain needs to be explicitly 
+saved by interacting with the storage object e.g. entries. In the main.ts file, the contract functions like 
+`addEntry`, `upVoteEntry` and `getEntries` are defined. Function declarations follow standard AssemblyScript conventions, 
+including the parameters they take, optional arguments and return values. 
+
+There are two types of functions that can interact with the blockchain -- "view" functions and "change" functions. 
+The difference, however, does not exist on the contract level. 
+View functions like `getEntries` do not actually change the state of the blockchain. Change functions 
+like `addEntry` and `upVoteEntry` modify the state.
+
+In the addEntry function, we create a new Entry and add it to the entries PersistentVector using the push method. 
+In the upVoteEntry function, we first fetch the entry from the entries PersistentVector using the index. Then we 
+increment the entry votes using context.attachedDeposit. Then we update the entries PersistentVector using the index.
 
 #### assembly/__tests__/registry.spec.ts
 ```
@@ -185,6 +225,10 @@ describe('attached deposit tests', () => {
 });
 ```
 
+To make sure our smart contract works as expected, we have written the above JavaScript tests. It tests various cases
+like add an entry, upvote an entry, retrieve entries and attach a deposit to a contract call. To run the tests, we use
+`yarn test` command. It then prints the results to the console.
+
 Setup
 ======
 ```
@@ -247,8 +291,8 @@ yarn start
 
 Then visit http://localhost:1234 from your browser to test the Near Registry
 
-Deploy frontend using netlify
-=============================
+Deploy the Frontend using netlify
+=================================
 
 Run the following commands from the near-registry folder
 
@@ -263,7 +307,7 @@ netlify deploy --prod
 Then follow the instructions given by the netlify cli and specify `./dist` as the publish directory
 
 Screenshots
-======
+===========
 ![](src/screenshots/near_registry_1.png)
 
 ![](src/screenshots/near_registry_2.png)
@@ -288,6 +332,7 @@ https://near-registry.netlify.app/
   [near-cli]: https://github.com/nearprotocol/near-cli
   [CLI]: https://www.w3schools.com/whatis/whatis_cli.asp
   [create-near-app]: https://github.com/nearprotocol/create-near-app
+  [NEAR Frontend]: https://docs.near.org/docs/api/naj-quick-reference
 
 
 Credits
